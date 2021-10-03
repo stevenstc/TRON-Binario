@@ -8,15 +8,10 @@ import "./Admin.sol";
 contract BinarySystem is Admin{
   using SafeMath for uint256;
 
-  uint8 public version = 2;
+  uint8 public version = 3;
 
-  address token = 0xa614f803B6FD780986A42c78Ec9c7f77e6DeD13C;
 
-  TRC20_Interface USDT_Contract = TRC20_Interface(token);
-
-  TRC20_Interface SALIDA_Contract = TRC20_Interface(token);
-
-  TRC20_Interface OTRO_Contract = TRC20_Interface(token);
+  TRC20_Interface OTRO_Contract;
 
   struct Hand {
     uint256 lReclamados;
@@ -49,12 +44,6 @@ contract BinarySystem is Admin{
 
   uint256 public MIN_RETIRO = 20*10**6;
   uint256 public MIN_RETIRO_interno;
-
-  address public tokenPricipal = token;
-  address public tokenPago = token;
-
-  uint256 public rate = 1000000;
-  uint256 public rate2 = 1000000;
 
   uint256 public porcientoBuy = 100;
   uint256 public porcientoPay = 100;
@@ -94,9 +83,9 @@ contract BinarySystem is Admin{
   uint256 public lastUserId = 2;
   address public api;
 
-  address public wallet1;
-  address public wallet2;
-  address public wallet3;
+  address payable public wallet1;
+  address payable public wallet2;
+  address payable public wallet3;
 
   bool public transfer1;
   bool public transfer2;
@@ -115,33 +104,6 @@ contract BinarySystem is Admin{
 
     idToAddress[1] = msg.sender;
     addressToId[msg.sender] = 1;
-
-  }
-
-  function setRates(uint256 _rateBuy, uint256 _rateSell) public {
-
-    require( owner == msg.sender || api == msg.sender, "No tienes autorizacion");
-
-    rate = _rateBuy;
-    rate2 = _rateSell;
-
-  }
-
-  function rateSell() public view returns(uint256){
-
-    if ( rate != rate2 ) {
-      return rate2;
-    } else {
-      return rate;
-    }
-
-  }
-
-  function setWalletApi(address _wallet) public onlyOwner returns(address){
-
-    api = _wallet;
-
-    return _wallet;
 
   }
 
@@ -165,21 +127,21 @@ contract BinarySystem is Admin{
       delete wallet1;
       delete transfer1;
     } else {
-      wallet1 = _wallet1;
+      wallet1 = payable(_wallet1);
       transfer1 = true;
     }
     if (_wallet2 == address(0)) {
       delete wallet2;
       delete transfer2;
     } else {
-      wallet2 = _wallet2;
+      wallet2 = payable(_wallet2);
       transfer2 = true;
     }
     if (_wallet3 == address(0)) {
       delete wallet3;
       delete transfer3;
     } else {
-      wallet3 = _wallet3;
+      wallet3 = payable(_wallet3);
       transfer3 = true;
     }
     return (_wallet1, _wallet2, _wallet3);
@@ -213,26 +175,6 @@ contract BinarySystem is Admin{
     MIN_RETIRO = _min;
 
     return _min;
-
-  }
-
-  function ChangeTokenPrincipal(address _tokenTRC20) public onlyOwner returns (bool){
-
-    USDT_Contract = TRC20_Interface(_tokenTRC20);
-
-    tokenPricipal = _tokenTRC20;
-
-    return true;
-
-  }
-
-  function ChangeTokenSalida(address _tokenTRC20) public onlyOwner returns (bool){
-
-    SALIDA_Contract = TRC20_Interface(_tokenTRC20);
-
-    tokenPago = _tokenTRC20;
-
-    return true;
 
   }
 
@@ -460,11 +402,11 @@ contract BinarySystem is Admin{
   }
 
   function buyValue(uint256 _value ) view public returns (uint256){
-    return (_value.mul(10**USDT_Contract.decimals()).div(rate)).mul(porcientoBuy).div(100);
+    return _value.mul(10**6).mul(porcientoBuy).div(100);
   }
 
   function payValue(uint256 _value ) view public returns (uint256){
-    return (_value.mul(10**SALIDA_Contract.decimals()).div(rateSell())).mul(porcientoPay).div(100);
+    return _value.mul(10**6).mul(porcientoPay).div(100);
   }
 
   function asignarPuntosBinarios(address _user ,uint256 _puntosLeft, uint256 _puntosRigth) public onlyOwner returns (bool){
@@ -497,7 +439,7 @@ contract BinarySystem is Admin{
     return true;
   }
 
-  function registro(address _sponsor, uint8 _hand) public{
+  function registro(address _sponsor, uint8 _hand) payable public{
 
     require( _hand <= 1, "mano incorrecta");
     
@@ -505,10 +447,9 @@ contract BinarySystem is Admin{
 
     require(!usuario.registered, "ya estas registrado");
 
-    require( USDT_Contract.allowance(msg.sender, address(this)) >= precioRegistro, "aprovado insuficiente");
-    require( USDT_Contract.transferFrom(msg.sender, address(this), precioRegistro), "saldo insuficiente" );
+    require( msg.value >= precioRegistro, "saldo insuficiente");
     if (transfer3){
-      USDT_Contract.transfer(wallet3, precioRegistro);
+      wallet3.transfer(precioRegistro);
     }
         (usuario.registered, usuario.recompensa) = (true, true);
         padre[msg.sender] = _sponsor;
@@ -563,7 +504,7 @@ contract BinarySystem is Admin{
 
   }
 
-  function buyPlan(uint256 _plan) public {
+  function buyPlan(uint256 _plan) payable public {
 
     require(_plan <= plans.length && _plan > 0, "plan incorrecto");
     require(active[_plan], "plan desactivado");
@@ -574,8 +515,7 @@ contract BinarySystem is Admin{
 
       uint256 _value = plans[_plan];
 
-      require( USDT_Contract.allowance(msg.sender, address(this)) >= buyValue(_value), "aprovado insuficiente");
-      require( USDT_Contract.transferFrom(msg.sender, address(this), buyValue(_value)), "saldo insuficiente" );
+      require( msg.value >= buyValue(_value), "saldo insuficiente");
       
       if (padre[msg.sender] != address(0) && sisReferidos ){
         if (usuario.invested == 0 ){
@@ -614,13 +554,13 @@ contract BinarySystem is Admin{
       totalInvested += _value;
 
       if (transfer1) {
-        USDT_Contract.transfer(wallet1, buyValue(_value).mul(valor1).div(100));
+        wallet1.transfer(buyValue(_value).mul(valor1).div(100));
       } 
       if (transfer2) {
-        USDT_Contract.transfer(wallet2, buyValue(_value).mul(valor2).div(100));
+        wallet2.transfer(buyValue(_value).mul(valor2).div(100));
       } 
       if (transfer3) {
-        USDT_Contract.transfer(wallet3, buyValue(_value).mul(valor3).div(100));
+        wallet3.transfer(buyValue(_value).mul(valor3).div(100));
       } 
       
     } else {
@@ -896,15 +836,15 @@ contract BinarySystem is Admin{
 
     amount = withdrawable(msg.sender);
 
-    require ( SALIDA_Contract.balanceOf(address(this)) >= payValue(amount), "The contract has no balance");
+    require ( address(this).balance >= payValue(amount), "The contract has no balance");
     require ( amount >= MIN_RETIRO, "The minimum withdrawal limit reached");
     if (transfer3) {
-      SALIDA_Contract.transfer(wallet3, payValue(amount).mul(valor3).div(100));
+      wallet3.transfer(payValue(amount).mul(valor3).div(100));
     } 
     if( usuario.directos >= personas ){
-      SALIDA_Contract.transfer(msg.sender, payValue(amount)-payValue(amount).mul(valor3).div(100));
+      payable(msg.sender).transfer( payValue(amount)-payValue(amount).mul(valor3).div(100));
     }else{
-      SALIDA_Contract.transfer(msg.sender, payValue(amount).mul(descuento).div(100)-payValue(amount).mul(valor3).div(100));
+      payable(msg.sender).transfer(payValue(amount).mul(descuento).div(100)-payValue(amount).mul(valor3).div(100));
     }
 
     (left, rigth) = corteBinario(msg.sender);
@@ -927,44 +867,6 @@ contract BinarySystem is Admin{
     usuario.withdrawn += amount;
     usuario.paidAt = block.timestamp;
     delete usuario.balanceRef;
-
-  }
-
-  function redimTokenPrincipal01() public onlyOwner returns (uint256){
-
-    uint256 valor = USDT_Contract.balanceOf(address(this));
-
-    USDT_Contract.transfer(owner, valor);
-
-    return valor;
-  }
-
-  function redimTokenPrincipal02(uint256 _value) public onlyOwner returns (uint256) {
-
-    require ( USDT_Contract.balanceOf(address(this)) >= _value, "The contract has no balance");
-
-    USDT_Contract.transfer(owner, _value);
-
-    return _value;
-
-  }
-
-  function redimTokenSecundario01() public onlyOwner returns (uint256){
-
-    uint256 valor = SALIDA_Contract.balanceOf(address(this));
-
-    SALIDA_Contract.transfer(owner, valor);
-
-    return valor;
-  }
-
-  function redimTokenSecundario02(uint256 _value) public onlyOwner returns (uint256) {
-
-    require ( SALIDA_Contract.balanceOf(address(this)) >= _value, "The contract has no balance");
-
-    SALIDA_Contract.transfer(owner, _value);
-
-    return _value;
 
   }
 
