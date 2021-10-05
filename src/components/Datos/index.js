@@ -80,14 +80,10 @@ export default class Datos extends Component {
 
     let esto = await Utils.contract.setstate().call();
 
-    var direccioncontract = await Utils.contract.tokenPago().call();
-    var contractUSDT = await window.tronWeb.contract().at(direccioncontract);
-    var decimales = await contractUSDT.decimals().call();
-    //console.log(esto);
     this.setState({
       totalInvestors: parseInt(esto.Investors._hex),
-      totalInvested: parseInt(esto.Invested._hex)/10**decimales,
-      totalRefRewards: parseInt(esto.RefRewards._hex)/10**decimales
+      totalInvested: parseInt(esto.Invested._hex)/10**6,
+      totalRefRewards: parseInt(esto.RefRewards._hex)/10**6
 
     });
 

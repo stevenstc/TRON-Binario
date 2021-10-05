@@ -125,13 +125,8 @@ export default class Oficina extends Component {
     let direccion = window.tronWeb.defaultAddress.base58;
     let usuario = await Utils.contract.investors(direccion).call();
     usuario.withdrawable = await Utils.contract.withdrawable(direccion).call();
-    
-    var tronUSDT = await window.tronWeb;
-    var direccioncontract = await Utils.contract.tokenPricipal().call();
-    var contractUSDT = await tronUSDT.contract().at(direccioncontract); 
-    var decimales = await contractUSDT.decimals().call();
-
-    //console.log(usuario);
+ 
+    var decimales = 6;
 
     usuario.amount = parseInt(usuario.amount._hex);
     usuario.invested = parseInt(usuario.invested);
@@ -141,8 +136,6 @@ export default class Oficina extends Component {
     usuario.totalRef = parseInt(usuario.totalRef._hex);
     usuario.paidAt = parseInt(usuario.paidAt._hex);
     usuario.withdrawable = parseInt(usuario.withdrawable._hex);
-
-    //console.log(usuario);
 
     var despositos = await Utils.contract.depositos(direccion).call();
     var valores = despositos[0];
@@ -247,10 +240,7 @@ export default class Oficina extends Component {
     available = (available*1).toFixed(6);
     available = parseFloat(available);
 
-    var direccioncontract = await Utils.contract.tokenPricipal().call();
-    var contractUSDT = await window.tronWeb.contract().at(direccioncontract);
-
-    var decimales = await contractUSDT.decimals().call();
+    var decimales = 6;
 
     var MIN_RETIRO = await Utils.contract.MIN_RETIRO().call();
     MIN_RETIRO = parseInt(MIN_RETIRO._hex)/10**decimales;
@@ -259,7 +249,7 @@ export default class Oficina extends Component {
       await Utils.contract.withdraw().send();
     }else{
       if (available < MIN_RETIRO) {
-        window.alert("The minimum to withdraw are: "+(MIN_RETIRO)+" USDT");
+        window.alert("The minimum to withdraw are: "+(MIN_RETIRO)+" TRX");
       }
     }
   };
@@ -293,7 +283,7 @@ export default class Oficina extends Component {
                 <h4 className="title"><a href={"https://tronscan.io/#/address/"+direccion} style={{"wordWrap": "break-word"}}>{direccion}</a></h4>
                
                 <br></br>
-                <b>{(this.state.withdrawn+available).toFixed(2)} USDT</b> Earning up to <b>{this.state.valorPlan} USDT</b>
+                <b>{(this.state.withdrawn+available).toFixed(2)} USDT</b> Earning up to <b>{this.state.valorPlan} TRX</b>
                 <div className="progress" style={{"height": "20px"}}>
                   <div className="progress-bar bg-info " role="progressbar" style={{"width": this.state.progresoUsdt+"%"}} aria-valuenow={this.state.progresoUsdt} aria-valuemin="0" aria-valuemax="100">{this.state.progresoUsdt+"%"}</div>
                 </div>
@@ -362,23 +352,23 @@ export default class Oficina extends Component {
             <div className="box">
               <div className="icon"><i className="ion-ios-speedometer-outline" style={{color: '#ff689b'}}></i></div>
               
-              <h4 className="title"><a href="#services">Available {available} USDT</a></h4>
+              <h4 className="title"><a href="#services">Available {available} TRX</a></h4>
                 
-              <button type="button" className="btn btn-info d-block text-center mx-auto mt-1" onClick={() => this.withdraw()}>Withdraw ~ {(available/this.state.precioSITE).toFixed(2)} USDT</button>
+              <button type="button" className="btn btn-info d-block text-center mx-auto mt-1" onClick={() => this.withdraw()}>Withdraw ~ {(available/this.state.precioSITE).toFixed(2)} TRX</button>
                  
               
               <hr></hr>
-              <p className="description">earned <b>{(this.state.withdrawn).toFixed(2)} USDT</b> </p>
-              <p className="description">Total invested <b>{invested} USDT</b> </p>
+              <p className="description">earned <b>{(this.state.withdrawn).toFixed(2)} TRX</b> </p>
+              <p className="description">Total invested <b>{invested} TRX</b> </p>
             </div>
           </div>
           <div className="col-md-6 col-lg-5 wow bounceInUp" data-wow-duration="1s">
             <div className="box">
               <div className="icon"><i className="ion-ios-analytics-outline" style={{color: '#ff689b'}}></i></div>
               <p className="description">Bonus </p>
-              <h4 className="title"><a href="#services">{(this.state.balanceRef+this.state.bonusBinario).toFixed(2)} USDT</a></h4>
+              <h4 className="title"><a href="#services">{(this.state.balanceRef+this.state.bonusBinario).toFixed(2)} TRX</a></h4>
               <hr></hr>
-              <p className="description">({this.state.directos}) Referral direct <b>{(this.state.balanceRef).toFixed(2)} USDT</b> </p>
+              <p className="description">({this.state.directos}) Referral direct <b>{(this.state.balanceRef).toFixed(2)} TRX</b> </p>
               <p className="description">({this.state.personasDerecha+this.state.personasIzquierda}) Binary earn <b>{(this.state.bonusBinario).toFixed(2)} USDT</b> </p>
               
             </div>

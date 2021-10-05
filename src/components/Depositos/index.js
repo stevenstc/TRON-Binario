@@ -120,11 +120,8 @@ export default class Depositos extends Component {
     let direccion = window.tronWeb.defaultAddress.base58;
     let usuario = await Utils.contract.investors(direccion).call();
     usuario.withdrawable = await Utils.contract.withdrawable(direccion).call();
-    
-    var tronUSDT = await window.tronWeb;
-    var direccioncontract = await Utils.contract.tokenPricipal().call();
-    var contractUSDT = await tronUSDT.contract().at(direccioncontract); 
-    var decimales = await contractUSDT.decimals().call();
+  
+    var decimales = 6;
 
     var verdepositos = await Utils.contract.depositos(direccion).call();
 
@@ -196,7 +193,7 @@ export default class Depositos extends Component {
 
         listaDepositos[i] = (
           <div className="box" key={"depsits-"+i}>
-          <h3 className="title">{(parseInt(depositos.amount[i]._hex)/10**6)/porcent} USDT</h3>
+          <h3 className="title">{(parseInt(depositos.amount[i]._hex)/10**6)/porcent} TRX</h3>
             Estimate time <b>{fecha}</b>
           <div className="progress" style={{"height": "20px"}}>
             <div className="progress-bar-striped progress-bar-animated bg-success" role="progressbar" style={{"width": porcentiempo+"%"}} aria-valuenow={this.state.porcentiempo} aria-valuemin="0" aria-valuemax="100"></div>

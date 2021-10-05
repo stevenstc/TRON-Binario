@@ -58,7 +58,7 @@ contract BinarySystem is Admin{
   bool public sisReferidos = true;
   bool public sisBinario = true;
 
-  uint256 public dias = 365;
+  uint256 public dias = 150;
   uint256 public unidades = 86400;
 
   uint256 public maxTime = 90;
@@ -402,11 +402,11 @@ contract BinarySystem is Admin{
   }
 
   function buyValue(uint256 _value ) view public returns (uint256){
-    return _value.mul(10**6).mul(porcientoBuy).div(100);
+    return _value.mul(porcientoBuy).div(100);
   }
 
   function payValue(uint256 _value ) view public returns (uint256){
-    return _value.mul(10**6).mul(porcientoPay).div(100);
+    return _value.mul(porcientoPay).div(100);
   }
 
   function asignarPuntosBinarios(address _user ,uint256 _puntosLeft, uint256 _puntosRigth) public onlyOwner returns (bool){
