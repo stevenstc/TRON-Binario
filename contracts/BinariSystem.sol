@@ -42,7 +42,7 @@ contract BinarySystem is Admin{
     Hand hands;
   }
 
-  uint256 public MIN_RETIRO = 20*10**6;
+  uint256 public MIN_RETIRO = 10*10**6;
   uint256 public MIN_RETIRO_interno;
 
   uint256 public porcientoBuy = 100;
@@ -62,7 +62,7 @@ contract BinarySystem is Admin{
   uint256 public unidades = 86400;
 
   uint256 public maxTime = 90;
-  uint256 public porcent = 200;
+  uint256 public porcent = 112;
 
   uint256 public porcentPuntosBinario = 10;
 

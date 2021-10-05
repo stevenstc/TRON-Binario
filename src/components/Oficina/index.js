@@ -283,7 +283,7 @@ export default class Oficina extends Component {
                 <h4 className="title"><a href={"https://tronscan.io/#/address/"+direccion} style={{"wordWrap": "break-word"}}>{direccion}</a></h4>
                
                 <br></br>
-                <b>{(this.state.withdrawn+available).toFixed(2)} USDT</b> Earning up to <b>{this.state.valorPlan} TRX</b>
+                <b>{(this.state.withdrawn+available).toFixed(2)} TRX</b> Earning up to <b>{this.state.valorPlan} TRX</b>
                 <div className="progress" style={{"height": "20px"}}>
                   <div className="progress-bar bg-info " role="progressbar" style={{"width": this.state.progresoUsdt+"%"}} aria-valuenow={this.state.progresoUsdt} aria-valuemin="0" aria-valuemax="100">{this.state.progresoUsdt+"%"}</div>
                 </div>
@@ -291,7 +291,7 @@ export default class Oficina extends Component {
                 <div className="progress" style={{"height": "20px"}}>
                   <div className="progress-bar bg-warning " role="progressbar" style={{"width": this.state.progresoRetiro+"%"}} aria-valuenow={this.state.progresoRetiro} aria-valuemin="0" aria-valuemax="100">{this.state.progresoRetiro+"%"}</div>
                 </div>
-                Claimed <b>{(this.state.withdrawn).toFixed(2)} USDT</b>
+                Claimed <b>{(this.state.withdrawn).toFixed(2)} TRX</b>
 
                 <br></br>
                 <button type="button" className="btn btn-success d-block text-center mx-auto mt-1" onClick={() => document.getElementById("why-us").scrollIntoView({block: "end", behavior: "smooth"}) }>Upgrade Plan</button>

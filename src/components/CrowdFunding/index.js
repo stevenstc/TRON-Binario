@@ -131,13 +131,8 @@ export default class CrowdFunding extends Component {
 
     var porcentiempo = ((Date.now()-inversors.inicio)*100)/tiempo;
 
-    var valorPlan = 0;
-
     if( porcentiempo < 100 ){
       aprovado = "Update Plan";
-
-      valorPlan = inversors.plan/10**6;
-      
     }
 
     var partner = cons.WS;
@@ -293,10 +288,6 @@ export default class CrowdFunding extends Component {
           var MIN_RETIRO = await Utils.contract.MIN_RETIRO().call();
           MIN_RETIRO = parseInt(MIN_RETIRO._hex);
 
-          var despositos = await Utils.contract.depositos(accountAddress).call();
-
-          console.log(despositos[0].length);
-
           if (userWithdrable > MIN_RETIRO ){
             window.alert("Va comprar plan de menor o igual valor debe retirar lo disponible para continuar.");
             if(window.confirm("¿Desea realizar el retiro de su disponible?.")){
@@ -315,7 +306,7 @@ export default class CrowdFunding extends Component {
               }
             }
           
-          }if (despositos[0].length === 0){
+          }else{
             buy = Utils.contract.buyPlan(valueUSDT).send({callValue:amount*10**6});
             buy.then(() => window.alert("Felicidades inversión exitosa"))
             .then(() => document.getElementById("services").scrollIntoView({block: "start", behavior: "smooth"}));
